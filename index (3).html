@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&family=Caveat:wght@500;700&family=Inter:wght@300;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#faf9f5;--ink:#111;--gold:#f59e0b;--dark:#07070c;--ph:#e7e5df}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth;background:var(--cream)}
+body{font-family:"Inter","Hind Siliguri",system-ui,sans-serif;color:var(--ink);background:var(--cream);overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+button{font-family:inherit;cursor:pointer}
+
+.slide{position:relative;min-height:100vh;height:100vh;scroll-snap-align:start;overflow:hidden;background:var(--cream)}
+.fx{opacity:0;transform:translateY(38px);transition:opacity 1s cubic-bezier(.2,.8,.2,1) var(--d,0s),transform 1s cubic-bezier(.2,.8,.2,1) var(--d,0s)}
+.slide.on .fx{opacity:1;transform:none}
+.tag{font:500 12px/1 Inter;letter-spacing:.32em;color:#8a8a8a;text-transform:uppercase}
+.sec{font:300 clamp(28px,4vw,46px)/1.1 Inter;letter-spacing:-.01em}
+.sec b{font-weight:800}
+
+/* Admin trigger & HUD */
+#adminBtn{position:fixed;top:14px;left:14px;z-index:300;width:36px;height:36px;border-radius:50%;border:1px solid rgba(0,0,0,.2);background:rgba(255,255,255,.75);backdrop-filter:blur(8px);font:600 13px Inter;opacity:.6;transition:opacity .2s}
+#adminBtn:hover{opacity:1}
+#hud{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:250;display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:999px;background:rgba(20,20,22,.78);backdrop-filter:blur(10px);color:#fff;font:600 11px/1 "Inter";letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;transition:opacity .4s}
+#hud button{width:28px;height:28px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:15px}
+#hud button:hover{background:rgba(255,255,255,.25)}
+#hLabel{padding:0 8px;min-width:150px;text-align:center}
+#dots{display:flex;gap:5px;padding-right:4px}
+#dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .35s}
+#dots i.a{background:var(--gold);width:16px;border-radius:4px}
+
+/* Photos */
+.pic{position:relative;width:100%;height:100%;overflow:hidden}
+.pic img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.pic:hover img{transform:scale(1.06)}
+.ph{width:100%;height:100%;display:grid;place-items:center;background:var(--phbg,var(--ph));font-size:clamp(20px,3vw,34px);opacity:.85}
+.polaroid{background:#fff;padding:9px 9px 34px;box-shadow:0 14px 30px rgba(0,0,0,.18)}
+.polaroid .pic{aspect-ratio:1}
+.polaroid .cap{position:absolute;left:0;right:0;bottom:8px;text-align:center;font:700 22px/1 "Caveat";color:#222}
+.btn{border:0;border-radius:999px;padding:12px 22px;font:600 14px Inter;background:var(--ink);color:#fff;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.2)}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid #d6d6d6}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* 1. Intro */
+#s0{display:flex;align-items:center;padding:90px 6vw 40px}
+.intro{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.itext{position:relative;z-index:3;max-width:44%;min-width:260px}
+.itext h1{font-size:clamp(46px,7.4vw,108px);line-height:.92;letter-spacing:-.02em;margin:22px 0 22px}
+.itext h1 .l{display:block;overflow:hidden}
+.itext h1 .l span{display:inline-block;animation:rise 1.1s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+.itext h1 .t1{font-weight:300}
+.itext h1 .t2{font-weight:800}
+.itext h1 .t3{font-weight:800;color:var(--gold)}
+@keyframes rise{from{transform:translateY(110%)}to{transform:none}}
+.rule{width:0;height:2px;background:#b8860b;margin:6px 0 24px;animation:grow 1.2s .9s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes grow{to{width:88px}}
+.msg{font-size:17px;line-height:1.75;color:#333;max-width:430px}
+.msg .w{display:inline-block;opacity:0;filter:blur(6px);transform:translateY(8px);animation:wordIn .7s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:var(--d)}
+@keyframes wordIn{to{opacity:1;filter:none;transform:none}}
+.cue{margin-top:28px;font-size:12px;color:#888;animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(6px)}}
+.spiralWrap{position:relative;flex:0 0 auto;width:min(50vw,640px);height:min(78vh,640px)}
+.spiral{position:absolute;inset:0;transform-origin:50% 50%}
+.sc{position:absolute;width:var(--w);transform:translate(-50%,-50%) rotate(var(--r)) scale(0);animation:pop 1.1s cubic-bezier(.2,.9,.2,1) forwards;animation-delay:var(--d)}
+.sc .in{width:100%;aspect-ratio:1;border-radius:14px;overflow:hidden;background:#fff;padding:0;box-shadow:0 18px 40px rgba(0,0,0,.18);animation:floaty 7s ease-in-out infinite;animation-delay:var(--fd)}
+.sc .in .pic{border-radius:14px}
+@keyframes pop{to{transform:translate(-50%,-50%) rotate(var(--r)) scale(1)}}
+@keyframes floaty{50%{transform:translateY(-10px)}}
+
+/* 2. Banner loops */
+#s1{display:grid;place-content:center;gap:18px;background:var(--ink);color:#fff}
+.marq{overflow:hidden;white-space:nowrap;transform:rotate(-3deg);padding:6px 0}
+.marq.alt{transform:rotate(3deg)}
+.track{display:inline-flex;animation:loop 30s linear infinite}
+.track.rev{animation-direction:reverse;animation-duration:36s}
+.track span{font:800 clamp(44px,8.6vw,120px)/1.05 Inter;padding-right:40px;letter-spacing:-.02em}
+.track span.o{color:transparent;-webkit-text-stroke:1.4px #fff}
+.track span.g{color:var(--gold)}
+.track span.s{font-family:"Caveat";font-weight:700;color:#fff;font-size:clamp(50px,9vw,128px)}
+@keyframes loop{to{transform:translateX(-50%)}}
+
+/* 3. Galaxy */
+#s2{background:radial-gradient(ellipse at 50% 40%,#17151f 0%,var(--dark) 70%);color:#fff}
+#stars{position:absolute;inset:0;width:100%;height:100%}
+.gridfloor{position:absolute;left:-30%;right:-30%;bottom:-20%;height:70%;background-image:linear-gradient(rgba(120,160,255,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(120,160,255,.12) 1px,transparent 1px);background-size:60px 60px;transform:perspective(500px) rotateX(62deg);opacity:.6;animation:gridmove 8s linear infinite}
+@keyframes gridmove{to{background-position:0 60px}}
+#viewport{position:absolute;inset:0;touch-action:none;cursor:grab}
+#viewport:active{cursor:grabbing}
+#space{position:absolute;left:50%;top:50%;width:0;height:0;transform-origin:0 0;transition:transform .12s linear}
+.orb{position:absolute;width:clamp(120px,13vw,170px);transform:translate(-50%,-50%) rotate(var(--r));animation:pop2 1s cubic-bezier(.2,.9,.2,1) both;animation-delay:var(--d)}
+@keyframes pop2{from{opacity:0;filter:blur(8px)}}
+.og{position:relative;background:#1c1c26;padding:8px 8px 30px;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.06);animation:floaty 6s ease-in-out infinite;animation-delay:var(--fd);transition:box-shadow .3s}
+.og:hover{box-shadow:0 26px 60px rgba(0,0,0,.8),0 0 0 1px rgba(245,158,11,.5)}
+.og .pic{aspect-ratio:1;border-radius:8px}
+.og .ph{--phbg:#2a2a36;color:#888}
+.og span{position:absolute;left:0;right:0;bottom:6px;text-align:center;font:700 18px Caveat;color:#e9e9f0}
+.gctl{position:absolute;right:16px;bottom:70px;z-index:4;display:flex;flex-direction:column;gap:8px}
+.gctl button{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:18px;backdrop-filter:blur(6px)}
+.gctl button:hover{background:rgba(255,255,255,.2)}
+.hint{position:absolute;left:0;right:0;bottom:22px;text-align:center;color:#8d8d9b;font-size:13px;z-index:3;pointer-events:none}
+.sec-dark{position:absolute;top:84px;left:0;right:0;text-align:center;z-index:3;pointer-events:none;color:#fff}
+
+/* 4. Sketchbook */
+#s3{background:#0e0d12;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 16px 40px}
+#s3 .sec{text-align:center;margin-bottom:24px}
+.bookWrap{display:flex;align-items:center;gap:16px;width:100%;justify-content:center}
+.book{position:relative;width:min(84vw,920px);height:min(62vh,560px);perspective:1800px}
+.spread{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;background:#f7f4ec;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.6);overflow:hidden;animation:turn .8s cubic-bezier(.2,.8,.2,1)}
+.spread::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:22px;margin-left:-11px;background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(0,0,0,0) 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.18));z-index:2}
+@keyframes turn{from{opacity:0;transform:perspective(1800px) rotateY(-28deg) translateX(40px)}to{opacity:1;transform:none}}
+.pg{position:relative;padding:34px 34px;display:grid;align-content:center;gap:14px}
+.pg .pic{border-radius:6px;box-shadow:0 10px 24px rgba(0,0,0,.18);aspect-ratio:1;height:auto}
+.pg.l{background:linear-gradient(120deg,#fbe9d0,#f7f4ec)}
+.pg.r{background:linear-gradient(240deg,#f1f7ee,#f7f4ec)}
+.stk{position:absolute;font-size:clamp(34px,5vw,54px);filter:drop-shadow(0 6px 8px rgba(0,0,0,.25));transform:rotate(var(--r,-8deg));animation:wobble 4s ease-in-out infinite}
+.stk.a{left:12px;bottom:14px}.stk.b{right:14px;top:14px}
+@keyframes wobble{50%{transform:rotate(calc(var(--r,-8deg) + 6deg)) translateY(-4px)}}
+.quote{font:700 clamp(22px,2.6vw,30px)/1.35 "Caveat";color:#222;background:#ffe8a3;padding:14px 18px;transform:rotate(-1.5deg);box-shadow:0 6px 14px rgba(0,0,0,.12);align-self:center}
+.arr{width:46px;height:46px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;font-size:22px;flex:0 0 auto}
+.arr:hover{background:rgba(255,255,255,.2)}
+#bNo{margin-top:18px;color:#8d8d9b;font:500 13px Inter;letter-spacing:.2em}
+
+/* 5. Pinboard */
+#s4{background:#d8d0bf;background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);background-size:30px 30px;display:flex;flex-direction:column;align-items:center;padding:84px 4vw 30px}
+#s4 .sec{text-align:center;margin-bottom:8px}
+#board{position:relative;flex:1;width:100%;max-width:1200px;margin-top:6px}
+.pol{position:absolute;width:clamp(150px,19vw,210px);padding:10px 10px 40px;background:#fff;box-shadow:0 12px 26px rgba(0,0,0,.25);cursor:grab;touch-action:none;user-select:none;transition:box-shadow .25s,transform .35s cubic-bezier(.2,.8,.2,1);transform:rotate(var(--r));animation:drop .9s cubic-bezier(.2,.9,.2,1) both;animation-delay:var(--d)}
+@keyframes drop{from{opacity:0;margin-top:-40px}}
+.pol:hover{transform:rotate(0) scale(1.03)}
+.pol.dragging{box-shadow:0 26px 50px rgba(0,0,0,.35);transform:rotate(0) scale(1.05);cursor:grabbing}
+.pol .pic{aspect-ratio:1}
+.pol .cap{position:absolute;left:0;right:0;bottom:8px;text-align:center;font:700 23px/1 Caveat;color:#222;pointer-events:none}
+.pin{position:absolute;top:-9px;left:50%;margin-left:-9px;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a8a,#b00000);box-shadow:0 3px 4px rgba(0,0,0,.4);z-index:2}
+.heart{position:absolute;top:-16px;right:-14px;font-size:28px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));animation:beat 1.6s ease-in-out infinite;z-index:2}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+.bdl{position:absolute;color:#7a6d55;font:700 18px Caveat;pointer-events:none}
+
+/* 6. Finale */
+#s5{display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#fff3dc,var(--cream) 60%);text-align:center;padding:40px}
+.finc{max-width:820px}
+.finc h2{font:800 clamp(56px,11vw,150px)/.95 Inter;letter-spacing:-.03em;margin:16px 0 10px}
+.finc h2 em{font-style:normal;color:var(--gold)}
+.closing{font-size:clamp(16px,1.6vw,20px);line-height:1.7;color:#333;margin:14px auto 30px;max-width:620px}
+.conf{position:fixed;top:-20px;width:10px;height:14px;z-index:400;pointer-events:none;animation:fall var(--t) cubic-bezier(.3,.1,.6,1) forwards}
+@keyframes fall{to{transform:translate(var(--x),110vh) rotate(var(--rr))}}
+
+/* Lightbox */
+#lb{position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;background:rgba(8,8,12,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+#lb.open{display:flex;animation:fade .4s}
+@keyframes fade{from{opacity:0}}
+.lbin{width:min(480px,84vw);aspect-ratio:4/5;border-radius:18px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.6);animation:zin .5s cubic-bezier(.2,.8,.2,1);background:#111}
+.lbin .pic,.lbin img{width:100%;height:100%}
+.lbin img{object-fit:contain;background:#111}
+.lbin .ph{--phbg:#222;color:#666;font-size:64px}
+@keyframes zin{from{transform:scale(.88);opacity:0}}
+.nv{position:absolute;top:50%;transform:translateY(-50%);width:50px;height:50px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:24px;transition:background .2s}
+.nv:hover{background:rgba(255,255,255,.3)}
+#lbP{left:16px}#lbN{right:16px}
+#lbX{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:24px}
+.lbbar{position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:14px;color:#fff;font:500 13px Inter}
+.upl{background:rgba(255,255,255,.2);padding:10px 16px;border-radius:999px;cursor:pointer}
+.upl input{display:none}
+
+/* Admin & password */
+#pw{position:fixed;inset:0;z-index:400;display:none;place-items:center;background:rgba(0,0,0,.5)}
+#pw.open{display:grid}
+#pw .box{background:#fff;padding:26px;border-radius:18px;width:min(330px,88vw);text-align:center}
+#pw input{width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;font-size:18px;text-align:center;margin:14px 0}
+#admin{position:fixed;inset:0;z-index:350;display:none;background:#faf9f5;overflow:auto;padding:26px 16px 60px}
+#admin.open{display:block;animation:fade .3s}
+#admin .wrapA{max-width:780px;margin:0 auto}
+#admin h2{font:800 26px Inter;margin-bottom:4px}
+#admin .note{color:#666;font-size:14px;margin-bottom:10px}
+#admin fieldset{border:1px solid #e2e0da;border-radius:14px;padding:16px;margin:16px 0;background:#fff}
+#admin legend{font:700 13px Inter;letter-spacing:.12em;text-transform:uppercase;color:#555;padding:0 8px}
+#admin label.f{display:block;font:600 13px Inter;color:#444;margin:12px 0 6px}
+#admin input[type=text],#admin textarea{width:100%;padding:11px 13px;border:1px solid #d4d2cc;border-radius:10px;font:15px "Hind Siliguri",Inter;background:#fff}
+#admin textarea{min-height:64px}
+#admin .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#admin .slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+#admin .slot{border:1px dashed #bbb;border-radius:12px;padding:8px;text-align:center;font-size:12px}
+#admin .slot .pic{height:110px;border-radius:8px;margin-bottom:6px}
+#admin .slot input{font-size:11px;width:100%}
+#admin .bar{display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#faf9f5;padding:12px 0}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;padding:12px 18px;border-radius:12px;z-index:500;font:600 14px Inter;opacity:0;transition:all .35s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%)}
+
+/* Opening: gift box -> bloom -> cover */
+body.opening{overflow:hidden}
+body.opening #s0 *{animation-play-state:paused!important}
+#opener{position:fixed;inset:0;z-index:600;background:radial-gradient(circle at 50% 40%,#1b1622,#000 72%);overflow:hidden;transition:opacity 1s ease,visibility 1s}
+#opener.hide{opacity:0;visibility:hidden}
+#boxStage{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:26px;transition:opacity .7s,transform .9s cubic-bezier(.6,0,.2,1)}
+#boxStage.gone{opacity:0;transform:scale(1.25);pointer-events:none}
+.gbox{position:relative;width:min(170px,40vw);height:min(170px,40vw);cursor:pointer;animation:boxFloat 3s ease-in-out infinite}
+.gbox .bodyb{position:absolute;left:0;right:0;bottom:0;height:78%;border-radius:12px;background:linear-gradient(145deg,#2d2d36,#0b0b10);box-shadow:0 30px 60px rgba(0,0,0,.75),inset 0 0 0 1px rgba(255,255,255,.08);transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .9s;animation:glowBox 2.4s ease-in-out infinite}
+.gbox .bodyb::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:14%;margin-left:-7%;background:linear-gradient(#ffd27a,#d98a1a);box-shadow:0 0 18px rgba(255,170,60,.6)}
+.gbox .lid{position:absolute;left:-4%;right:-4%;top:10%;height:26%;border-radius:10px;background:linear-gradient(145deg,#3a3a44,#17171e);transform-origin:50% 100%;transition:transform 1s cubic-bezier(.2,.8,.2,1),opacity .9s;box-shadow:0 10px 24px rgba(0,0,0,.6)}
+.gbox .lid::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:14%;margin-left:-7%;background:linear-gradient(#ffd27a,#d98a1a)}
+.gbox:hover .lid{transform:translateY(-4px)}
+.gbox.open .lid{transform:translateY(-190px) rotate(-14deg);opacity:0}
+.gbox.open .bodyb{transform:scale(.55);opacity:0}
+.ohint{color:#9a9aa6;font:500 13px Inter;letter-spacing:.22em;animation:fadeHint 2.4s ease-in-out infinite}
+@keyframes boxFloat{50%{transform:translateY(-12px)}}
+@keyframes glowBox{50%{box-shadow:0 30px 70px rgba(255,160,60,.25),inset 0 0 0 1px rgba(255,200,120,.25)}}
+@keyframes fadeHint{50%{opacity:.35}}
+#flowerFrame{position:absolute;inset:0;width:100%;height:100%;border:0;opacity:0;pointer-events:none;transition:opacity 1.2s ease;background:#060208}
+#flowerFrame.show{opacity:1;pointer-events:auto}
+#nameCards{position:absolute;inset:0;z-index:3;display:grid;place-content:center;justify-items:center;gap:22px;padding:24px;text-align:center;color:#fff;background:rgba(6,2,8,.78);opacity:0;visibility:hidden;transition:opacity 1s ease,visibility 1s}
+#nameCards.show{opacity:1;visibility:visible}
+#nameCards .tag{color:#d9b77a}
+.ncRow{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.ncCard{min-width:170px;padding:18px 22px;border-radius:16px;background:linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1px solid rgba(255,220,150,.35);box-shadow:0 0 30px rgba(255,200,120,.15);animation:ncIn .9s cubic-bezier(.2,.8,.2,1) both;animation-delay:var(--d)}
+.ncLbl{display:block;font:500 11px Inter;letter-spacing:.25em;text-transform:uppercase;color:#d9b77a}
+.ncVal{display:block;margin-top:8px;font:700 30px/1.25 "Hind Siliguri",Inter,sans-serif;color:#fff8e6}
+.ncVal.ar{font-family:"Noto Naskh Arabic","Traditional Arabic",serif;direction:rtl}
+.ncMean{font:400 16px/1.6 "Hind Siliguri",Inter,sans-serif;color:#e8dcc8;max-width:520px}
+@keyframes ncIn{from{opacity:0;transform:translateY(24px) scale(.96)}}
+#oSkip{position:absolute;bottom:22px;right:20px;border:0;border-radius:999px;padding:10px 16px;font:600 13px Inter;background:rgba(255,255,255,.14);color:#fff;z-index:2;cursor:pointer}
+
+/* Letter slide + envelope */
+#sL{display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,#fff6e6,#f1e4cc 75%);padding:40px}
+.envWrap{display:grid;justify-items:center;gap:30px;text-align:center}
+.env{position:relative;width:min(560px,86vw);height:min(340px,50vw);cursor:pointer;animation:envFloat 4s ease-in-out infinite}
+@keyframes envFloat{50%{transform:translateY(-8px)}}
+.env .body{position:absolute;inset:0;border-radius:10px;background:linear-gradient(160deg,#f7ecd7,#e6d1aa);box-shadow:0 30px 60px rgba(90,60,20,.28),inset 0 0 0 1px rgba(120,90,50,.15)}
+.env .body::before{content:"";position:absolute;inset:0;border-radius:10px;background:linear-gradient(to bottom right,transparent calc(50% - 1.5px),rgba(120,90,50,.2) 50%,transparent calc(50% + 1.5px)),linear-gradient(to bottom left,transparent calc(50% - 1.5px),rgba(120,90,50,.2) 50%,transparent calc(50% + 1.5px))}
+.env .flap{position:absolute;left:0;right:0;top:0;height:56%;background:linear-gradient(180deg,#f0e0c3,#e2cba4);clip-path:polygon(0 0,100% 0,50% 100%);border-radius:10px 10px 0 0;transform-origin:50% 0;z-index:2;transition:transform .9s cubic-bezier(.2,.8,.2,1),opacity .6s .45s}
+.env.open .flap{transform:rotateX(180deg);opacity:0}
+.env .seal{position:absolute;left:50%;top:56%;width:78px;height:78px;margin:-39px 0 0 -39px;border:0;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e25b5b,#8e1212);color:#ffd9a0;font-size:30px;box-shadow:0 8px 18px rgba(0,0,0,.35),inset 0 -4px 8px rgba(0,0,0,.25);z-index:4;cursor:pointer;animation:sealPulse 2.2s ease-in-out infinite;transition:transform .5s,opacity .5s}
+.env .seal:hover{transform:scale(1.08)}
+.env.open .seal{opacity:0;transform:scale(.4)}
+@keyframes sealPulse{50%{box-shadow:0 8px 26px rgba(200,40,40,.45),inset 0 -4px 8px rgba(0,0,0,.25)}}
+#letterView{position:fixed;inset:0;z-index:450;display:grid;place-items:center;padding:20px;background:rgba(20,14,8,.55);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;visibility:hidden;transition:opacity .6s,visibility .6s}
+#letterView.show{opacity:1;visibility:visible}
+.letterCard{position:relative;width:min(640px,92vw);max-height:86vh;overflow:auto;padding:46px 44px 40px;border-radius:6px;background:#fffdf6 repeating-linear-gradient(transparent 0 33px,rgba(120,100,60,.12) 33px 34px);box-shadow:0 40px 90px rgba(0,0,0,.4);transform:translateY(40px) rotate(-.6deg) scale(.96);transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+#letterView.show .letterCard{transform:none}
+.letterCard h3{font:700 clamp(30px,4.4vw,40px)/1.2 Caveat;color:#3a2a1a;margin-bottom:12px}
+#letterBody p{font:400 17px/34px "Hind Siliguri",Inter,sans-serif;color:#3b3228;margin-bottom:14px}
+#letterSign{margin-top:22px;text-align:right;font:700 28px/1.35 Caveat;color:#7a3b22}
+#letterClose{position:absolute;top:10px;right:12px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.06);font-size:22px;cursor:pointer}
+
+/* Mobile */
+@media (max-width:820px){
+  #s0{padding:80px 22px 40px;align-items:flex-start}
+  .intro{flex-direction:column;justify-content:flex-start}
+  .itext{max-width:100%}
+  .itext h1{font-size:clamp(44px,13vw,70px)}
+  .spiralWrap{width:100%;height:46vh;margin-top:-10px}
+  .spread{grid-template-columns:1fr}
+  .spread::before{display:none}
+  .pg{padding:18px}
+  .pg.r{display:none}
+  .pol{width:150px}
+  #s4 .pol{width:140px}
+  #s4{height:auto;min-height:100vh}
+  #board{min-height:1500px}
+  #hLabel{min-width:0;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+  #dots{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.fx,.msg .w,.itext h1 .l span{opacity:1!important;transform:none!important;filter:none!important}.sc{transform:translate(-50%,-50%) rotate(var(--r))!important}}
+</style>
+</head>
+<body>
+<div id="opener">
+  <div id="boxStage">
+    <div class="gbox" id="gbox" role="button" tabindex="0" aria-label="খুলতে ট্যাপ করুন">
+      <div class="lid"></div>
+      <div class="bodyb"></div>
+    </div>
+    <p class="ohint">ট্যাপ করে খুলুন</p>
+  </div>
+  <iframe id="flowerFrame" src="flower/index.html" title="কাঠগোলাপ" allow="autoplay"></iframe>
+  <div id="nameCards">
+    <p class="tag">নামের অর্থ</p>
+    <div class="ncRow">
+      <div class="ncCard" style="--d:0s"><span class="ncLbl">বাংলা</span><span class="ncVal" data-k="nameBn"></span></div>
+      <div class="ncCard" style="--d:.2s"><span class="ncLbl">English</span><span class="ncVal" data-k="nameEn"></span></div>
+      <div class="ncCard" style="--d:.4s"><span class="ncLbl">عربي</span><span class="ncVal ar" data-k="nameAr"></span></div>
+    </div>
+    <p class="ncMean" data-k="meaning"></p>
+  </div>
+  <button id="oSkip">এগিয়ে যান ›</button>
+</div>
+
+<button id="adminBtn" aria-label="Admin">A</button>
+
+<nav id="hud" aria-label="Slides">
+  <button id="hPrev" aria-label="Previous slide">‹</button>
+  <span id="hLabel">01 / 06 · INTRO</span>
+  <button id="hNext" aria-label="Next slide">›</button>
+  <div id="dots"></div>
+</nav>
+
+<!-- 1. Intro -->
+<section class="slide" id="s0" data-label="Intro">
+  <div class="intro">
+    <div class="itext">
+      <p class="tag fx" data-k="date" style="--d:.1s"></p>
+      <h1>
+        <span class="l"><span class="t1" data-k="t1" style="--d:.2s"></span></span>
+        <span class="l"><span class="t2" data-k="t2" style="--d:.35s"></span></span>
+        <span class="l"><span class="t3" data-k="name" style="--d:.5s"></span></span>
+      </h1>
+      <div class="rule"></div>
+      <p class="msg" id="msg"></p>
+      <p class="cue">নিচে স্ক্রল করুন ↓</p>
+    </div>
+    <div class="spiralWrap"><div class="spiral" id="spiral"></div></div>
+  </div>
+</section>
+
+<!-- 2. Looping banners -->
+<section class="slide" id="s1" data-label="Banner">
+  <div class="marq"><div class="track" id="track1"></div></div>
+  <div class="marq alt"><div class="track rev" id="track2"></div></div>
+</section>
+
+<!-- 3. Galaxy -->
+<section class="slide" id="s2" data-label="Galaxy">
+  <canvas id="stars"></canvas>
+  <div class="gridfloor"></div>
+  <div class="sec-dark fx"><p class="tag">আমাদের মহাবিশ্ব</p></div>
+  <div id="viewport"><div id="space"></div></div>
+  <div class="gctl">
+    <button id="zin" aria-label="Zoom in">+</button>
+    <button id="zout" aria-label="Zoom out">−</button>
+    <button id="zreset" aria-label="Reset">⟲</button>
+  </div>
+  <p class="hint">টেনে সরান · চিমটি বা + − দিয়ে জুম · ছবিতে ট্যাপ করুন</p>
+</section>
+
+<!-- 4. Sketchbook -->
+<section class="slide" id="s3" data-label="Sketchbook">
+  <h2 class="sec fx"><b>Sketch</b>book</h2>
+  <div class="bookWrap fx" style="--d:.15s">
+    <button class="arr" id="bPrev" aria-label="Previous page">‹</button>
+    <div class="book" id="book"></div>
+    <button class="arr" id="bNext" aria-label="Next page">›</button>
+  </div>
+  <p id="bNo"></p>
+</section>
+
+<!-- 5. Pinboard -->
+<section class="slide" id="s4" data-label="Pinboard">
+  <h2 class="sec fx">পিন করা <b>মুহূর্তগুলো</b></h2>
+  <div id="board"></div>
+</section>
+
+<!-- 6. Letter -->
+<section class="slide" id="sL" data-label="Letter">
+  <div class="envWrap">
+    <p class="tag fx">একটা চিঠি তোমার জন্য</p>
+    <div class="env" id="env" role="button" tabindex="0" aria-label="চিঠি খুলুন">
+      <div class="body"></div>
+      <div class="flap"></div>
+      <button class="seal" id="seal" aria-label="সিলে ট্যাপ করুন">♥</button>
+    </div>
+    <p class="tag fx" style="--d:.3s">সিলে ট্যাপ করো</p>
+  </div>
+</section>
+
+<!-- 7. Finale -->
+<section class="slide" id="s5" data-label="Finale">
+  <div class="finc">
+    <p class="tag fx">With love</p>
+    <h2 class="fx" style="--d:.15s">Happy Birthday<br><em data-k="name"></em></h2>
+    <p class="closing fx" data-k="closing" style="--d:.3s"></p>
+    <button class="btn fx" id="party" style="--d:.45s">🎉 উদযাপন করুন</button>
+  </div>
+</section>
+
+<!-- Lightbox -->
+<div id="lb" role="dialog" aria-modal="true">
+  <button class="nv" id="lbP" aria-label="Previous photo">‹</button>
+  <div class="lbin" id="lbIn"></div>
+  <button class="nv" id="lbN" aria-label="Next photo">›</button>
+  <button id="lbX" aria-label="Close">×</button>
+  <div class="lbbar"><span id="lbCnt"></span><label class="upl">ছবি যুক্ত / বদলান<input type="file" id="lbFile" accept="image/*"></label></div>
+</div>
+
+<!-- Letter view -->
+<div id="letterView" role="dialog" aria-modal="true" aria-labelledby="letterTitle">
+  <div class="letterCard">
+    <button id="letterClose" aria-label="বন্ধ করুন">×</button>
+    <h3 id="letterTitle"></h3>
+    <div id="letterBody"></div>
+    <p id="letterSign"></p>
+  </div>
+</div>
+
+<!-- Password -->
+<div id="pw"><div class="box"><p class="tag">অ্যাডমিন</p><input type="password" id="pwInput" inputmode="numeric" placeholder="পাসওয়ার্ড"><button class="btn" id="pwGo">খুলুন</button></div></div>
+
+<!-- Admin panel -->
+<div id="admin">
+  <div class="wrapA">
+    <h2>অ্যাডমিন প্যানেল</h2>
+    <p class="note">যা বদলাবেন, তা লিখে নিচে "সেভ করুন" চাপুন। ছবি প্রতিটি স্লটে সরাসরি বসবে।</p>
+
+    <fieldset><legend>প্রথম স্ক্রিন</legend>
+      <label class="f">তারিখ (ছোট লেখা)</label><input type="text" data-f="date">
+      <div class="grid2">
+        <div><label class="f">প্রথম শব্দ</label><input type="text" data-f="t1"></div>
+        <div><label class="f">দ্বিতীয় শব্দ (বোল্ড)</label><input type="text" data-f="t2"></div>
+      </div>
+      <label class="f">বন্ধুর নাম (সবখানে ব্যবহার হবে)</label><input type="text" data-f="name">
+      <label class="f">শুভেচ্ছা বার্তা</label><textarea data-f="msg"></textarea>
+    </fieldset>
+
+    <fieldset><legend>শেষ স্ক্রিন</legend>
+      <label class="f">শেষের বার্তা</label><textarea data-f="closing"></textarea>
+    </fieldset>
+
+    <fieldset><legend>স্কেচবুকের ৪টি স্প্রেডের লেখা</legend>
+      <div id="quotesBox"></div>
+    </fieldset>
+
+    <fieldset><legend>নামের কার্ড ও ফুলের শব্দ</legend>
+      <div class="grid2">
+        <div><label class="f">নাম (বাংলা)</label><input type="text" data-f="nameBn"></div>
+        <div><label class="f">Name (English)</label><input type="text" data-f="nameEn"></div>
+      </div>
+      <label class="f">নাম (আরবি বা অন্য ভাষা, না থাকলে খালি রাখুন)</label><input type="text" data-f="nameAr">
+      <label class="f">অর্থ (বাংলা · English)</label><input type="text" data-f="meaning">
+      <label class="f">ফুল তৈরির শব্দ (প্রতি লাইনে বা কমা দিয়ে একটি করে)</label><textarea data-f="flowerWords" rows="5"></textarea>
+    </fieldset>
+
+    <fieldset><legend>চিঠি (সীল খুললে যা দেখাবে)</legend>
+      <label class="f">চিঠির শিরোনাম ({name} লিখলে বন্ধুর নাম বসবে)</label><input type="text" data-f="letterTitle">
+      <label class="f">চিঠির মূল লেখা (প্রতি অনুচ্ছেদের মাঝে একটা ফাঁকা লাইন দিন)</label><textarea data-f="letterBody" rows="9"></textarea>
+      <label class="f">নিচের স্বাক্ষর (নতুন লাইনের জন্য Enter চাপুন)</label><textarea data-f="letterSign" rows="2"></textarea>
+    </fieldset>
+
+    <fieldset><legend>স্টিকার (কমা দিয়ে ইমোজি লিখুন)</legend>
+      <input type="text" data-f="stickers">
+    </fieldset>
+
+    <fieldset><legend>পিনবোর্ডের ক্যাপশন (৮টি)</legend>
+      <div class="grid2" id="capsBox"></div>
+    </fieldset>
+
+    <fieldset><legend>ছবি (৮টি স্লট)</legend>
+      <div class="slots" id="slots"></div>
+    </fieldset>
+
+    <div class="bar">
+      <button class="btn" id="saveBtn">সেভ করুন</button>
+      <button class="btn ghost" id="resetBtn">ডিফল্টে ফিরুন</button>
+      <button class="btn ghost" id="closeAdmin">বন্ধ করুন</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const KEY = "bday_site_v3", N = 16, SLIDES = 7;
+  const DEF = {
+    date: "AUG 5", t1: "Happy", t2: "Birthday", name: "Wasika",
+    nameBn: "ওয়াসিকা", nameEn: "Wasika", nameAr: "وَاثِقَة",
+    meaning: "বিশ্বস্ত · নির্ভরযোগ্য   |   Trustworthy · Reliable",
+    flowerWords: "Wasika\nওয়াসিকা\nوَاثِقَة\nTrustworthy\nবিশ্বস্ত\nReliable\nনির্ভরযোগ্য\nFaithful\nHappy Birthday\nশুভ জন্মদিন",
+    msg: "wishing you a day filled with love, laughter, and all the happiness your heart can hold. May this year bring you endless joy and unforgettable memories. Happy Birthday, Wasika!",
+    closing: "Wasika, তোমার প্রতিটি হাসি আমার দিনটাকে সুন্দর করে। এই বছরটা তোমার জন্য হোক ভালোবাসা, আনন্দ আর অসংখ্য সুন্দর স্মৃতিতে ভরা।",
+    letterTitle: "প্রিয় {name},",
+    letterBody: "তোমার জন্মদিনটা আমার কাছে সবসময় বিশেষ একটা দিন। আজ তোমাকে কিছু কথা বলতে চাই, যা হয়তো সবসময় মুখে বলা হয় না।\n\nতুমি আমার জীবনে যে আলো এনেছ, তার জন্য আমি সত্যিই কৃতজ্ঞ। তোমার হাসি, তোমার যত্ন আর তোমার সঙ্গ, এই সবকিছু আমার কাছে অনেক দামি।\n\nএই নতুন বছরটা তোমার জন্য হোক শান্তি, ভালোবাসা আর অসংখ্য সুন্দর মুহূর্তে ভরা। যা চাও সবই যেন পূর্ণ হয়। জন্মদিনের অনেক অনেক শুভেচ্ছা!",
+    letterSign: "ভালোবাসা সহ,\nতোমার বন্ধু",
+    quotes: [
+      "You are the stars in my dark and cold nights — shining and unwavering.",
+      "May the flowers remind us why the rain was so necessary.",
+      "I don't wanna keep secrets just to keep you.",
+      "Happy Birthday, my favorite person.",
+      "Every moment with you feels like a page worth keeping.",
+      "Here's to more laughter, more memories, more us.",
+      "Some friendships are the stars that never fade.",
+      "Forever grateful for you. Keep shining."
+    ],
+    stickers: "🌹,🦋,🌙,🎀,🐱,✨,🌸,💖,🎈,⭐",
+    caps: Array(16).fill("Wasika"),
+    photos: ["images/05.jpg","images/16.jpg","images/15.jpg","images/09.jpg","images/14.jpg","images/08.jpg","images/01.jpg","images/06.jpg","images/07.jpg","images/12.jpg","images/13.jpg","images/03.jpg","images/02.jpg","images/04.jpg","images/10.jpg","images/11.jpg"]
+  };
+  let D;
+  try { D = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch { D = { ...DEF }; }
+  D.photos = D.photos || []; D.caps = D.caps || DEF.caps; D.quotes = D.quotes || DEF.quotes;
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); return true; } catch { return false; } };
+
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const stickers = () => D.stickers.split(",").map((s) => s.trim()).filter(Boolean);
+  const pic = (i) => `<div class="pic" data-i="${i}">${D.photos[i]
+    ? `<img src="${D.photos[i]}" alt="">`
+    : `<div class="ph"><span>📷</span></div>`}</div>`;
+  const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1900); };
+  const rnd = (i, k) => (((i + 1) * 9301 + k * 49297) % 233280) / 233280;
+
+  /* Texts */
+  function renderText() {
+    $$("[data-k]").forEach((el) => (el.textContent = D[el.dataset.k]));
+    $("#msg").innerHTML = esc(D.msg).split(/\s+/).filter(Boolean)
+      .map((w, i) => `<span class="w" style="--d:${(0.9 + i * 0.045).toFixed(2)}s">${w}</span>`).join(" ");
+  }
+
+  /* Intro spiral: cards grow along a spiral, the whole spiral slowly turns */
+  function renderSpiral() {
+    const sp = $("#spiral"); sp.innerHTML = "";
+    const total = 16;
+    for (let i = 0; i < total; i++) {
+      const t = i / (total - 1), a = t * Math.PI * 3.1 - 1.4, r = 10 + t * 40;
+      const el = document.createElement("div");
+      el.className = "sc";
+      el.style.left = (50 + Math.cos(a) * r) + "%";
+      el.style.top = (50 + Math.sin(a) * r * 1.05) + "%";
+      el.style.setProperty("--w", (13 + (1 - t) * 7) + "%");
+      el.style.setProperty("--r", ((i * 37) % 36 - 18) + "deg");
+      el.style.setProperty("--d", (0.2 + t * 1.1).toFixed(2) + "s");
+      el.style.setProperty("--fd", (-i * 0.4) + "s");
+      el.innerHTML = `<div class="in polaroid">${pic(i % N)}</div>`;
+      sp.appendChild(el);
+    }
+  }
+  let spinT = 0;
+  function spin() {
+    spinT += 0.05;
+    $("#spiral").style.transform = `rotate(${Math.sin(spinT / 40) * 8}deg)`;
+    requestAnimationFrame(spin);
+  }
+
+  /* Banners */
+  function renderBanners() {
+    const a = [D.t1, D.t2, D.name].filter(Boolean);
+    const row1 = a.map((w, i) => `<span class="${i % 2 ? "g" : ""}">${esc(w)}</span>`).join("") + `<span class="o">Happy Birthday</span>`;
+    const row2 = `<span class="s">${esc(D.name)}</span><span class="o">Happy Birthday</span><span class="g">${esc(D.name)}</span>`;
+    $("#track1").innerHTML = row1 + row1;
+    $("#track2").innerHTML = row2 + row2;
+  }
+
+  /* Galaxy */
+  const viewport = $("#viewport"), space = $("#space");
+  let gx = 0, gy = 0, gs = 1;
+  const pts = new Map();
+  function renderGalaxy() {
+    space.innerHTML = "";
+    const count = 16;
+    for (let i = 0; i < count; i++) {
+      const ang = i * 2.399, rad = 110 + ((i * 53) % 380);
+      const el = document.createElement("div");
+      el.className = "orb";
+      el.style.left = Math.cos(ang) * rad * 1.45 + "px";
+      el.style.top = Math.sin(ang) * rad * 0.8 + "px";
+      el.style.setProperty("--r", ((i * 23) % 14 - 7) + "deg");
+      el.style.setProperty("--d", (i * 0.07).toFixed(2) + "s");
+      el.style.setProperty("--fd", (-i * 0.5) + "s");
+      el.innerHTML = `<div class="og">${pic(i % N)}<span>${esc(D.caps[i % N])}</span></div>`;
+      space.appendChild(el);
+    }
+    applyG();
+  }
+  const applyG = () => (space.style.transform = `translate(${gx}px,${gy}px) scale(${gs})`);
+  const clampS = (s) => Math.min(2.6, Math.max(0.5, s));
+  const gest = { moved: false };
+  viewport.addEventListener("pointerdown", (e) => {
+    viewport.setPointerCapture(e.pointerId);
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    gest.moved = false;
+  });
+  viewport.addEventListener("pointermove", (e) => {
+    if (!pts.has(e.pointerId)) return;
+    const prev = pts.get(e.pointerId);
+    if (pts.size === 1) {
+      const dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+      if (Math.abs(dx) + Math.abs(dy) > 5) gest.moved = true;
+      gx += dx; gy += dy;
+    } else {
+      const [a, b] = [...pts.values()];
+      const d0 = Math.hypot(a.x - b.x, a.y - b.y);
+      pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const [c, d] = [...pts.values()];
+      const d1 = Math.hypot(c.x - d.x, c.y - d.y);
+      if (d0 > 0) gs = clampS(gs * (d1 / d0));
+      gest.moved = true;
+    }
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    applyG();
+  });
+  const endG = (e) => pts.delete(e.pointerId);
+  viewport.addEventListener("pointerup", endG);
+  viewport.addEventListener("pointercancel", endG);
+  viewport.addEventListener("wheel", (e) => {
+    if (!e.ctrlKey) return;
+    e.preventDefault(); gs = clampS(gs * (e.deltaY < 0 ? 1.08 : 0.92)); applyG();
+  }, { passive: false });
+  viewport.addEventListener("dblclick", () => { gs = gs > 1 ? 1 : 1.8; applyG(); });
+  $("#zin").onclick = () => { gs = clampS(gs * 1.2); applyG(); };
+  $("#zout").onclick = () => { gs = clampS(gs / 1.2); applyG(); };
+  $("#zreset").onclick = () => { gx = 0; gy = 0; gs = 1; applyG(); };
+
+  /* Starfield with twinkle */
+  const cv = $("#stars"), cx = cv.getContext("2d");
+  let stars = [];
+  function resizeStars() {
+    const w = cv.clientWidth, h = cv.clientHeight, dpr = devicePixelRatio || 1;
+    cv.width = w * dpr; cv.height = h * dpr; cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    stars = Array.from({ length: 190 }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.3 + .3, p: Math.random() * 6, s: Math.random() * .15 + .02 }));
+  }
+  function drawStars(t) {
+    const w = cv.clientWidth, h = cv.clientHeight;
+    cx.clearRect(0, 0, w, h);
+    for (const s of stars) {
+      s.y += s.s; if (s.y > h) s.y = 0;
+      cx.globalAlpha = .4 + .5 * Math.sin(t / 900 + s.p);
+      cx.fillStyle = "#fff";
+      cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 7); cx.fill();
+    }
+    requestAnimationFrame(drawStars);
+  }
+
+  /* Sketchbook spreads */
+  let spread = 0;
+  const SPREADS = N / 2;
+  function renderBook() {
+    const st = stickers();
+    const s = spread;
+    $("#book").innerHTML = `
+      <div class="spread">
+        <div class="pg l">${pic(2 * s)}<span class="stk a" style="--r:-9deg">${esc(st[(2 * s) % st.length] || "")}</span></div>
+        <div class="pg r"><div class="quote">${esc(D.quotes[s] || "")}</div>${pic(2 * s + 1)}<span class="stk b" style="--r:10deg">${esc(st[(2 * s + 1) % st.length] || "")}</span></div>
+      </div>`;
+    $("#bNo").textContent = `${s + 1} / ${SPREADS}`;
+    $("#bPrev").disabled = s === 0;
+    $("#bNext").disabled = s === SPREADS - 1;
+  }
+  $("#bPrev").onclick = () => { if (spread > 0) { spread--; renderBook(); } };
+  $("#bNext").onclick = () => { if (spread < SPREADS - 1) { spread++; renderBook(); } };
+  let swipe = null;
+  $("#book").addEventListener("pointerdown", (e) => (swipe = e.clientX));
+  $("#book").addEventListener("pointerup", (e) => {
+    if (swipe === null) return;
+    const dx = e.clientX - swipe; swipe = null;
+    if (dx < -50) $("#bNext").click(); else if (dx > 50) $("#bPrev").click();
+  });
+
+  /* Pinboard */
+  function renderBoard() {
+    const b = $("#board");
+    b.innerHTML = "";
+    const cols = innerWidth < 820 ? 2 : 4, rows = Math.ceil(12 / cols);
+    for (let i = 0; i < 12; i++) {
+      const col = i % cols, row = Math.floor(i / cols);
+      const el = document.createElement("div");
+      el.className = "pol";
+      el.dataset.idx = i;
+      const x = (6 + col * (88 / cols) + (rnd(i, 1) * 4 - 2));
+      const y = (4 + row * (88 / rows) + (rnd(i, 2) * 6 - 3));
+      el.style.left = x + "%";
+      el.style.top = y + "%";
+      el.style.setProperty("--r", (rnd(i, 3) * 14 - 7).toFixed(1) + "deg");
+      el.style.setProperty("--d", (i * 0.08).toFixed(2) + "s");
+      el.innerHTML = `<span class="pin"></span>${i % 3 === 0 ? '<span class="heart">💖</span>' : ""}${pic(i)}<div class="cap">${esc(D.caps[i])}</div>`;
+      b.appendChild(el);
+    }
+    if (b.dataset.bound) return;
+    b.dataset.bound = "1";
+    let drag = null, z = 10;
+    b.addEventListener("pointerdown", (e) => {
+      const el = e.target.closest(".pol"); if (!el) return;
+      const r = el.getBoundingClientRect();
+      drag = { el, ox: e.clientX - r.left, oy: e.clientY - r.top, sx: e.clientX, sy: e.clientY };
+      gest.moved = false;
+      el.setPointerCapture(e.pointerId);
+      el.style.zIndex = ++z;
+      el.classList.add("dragging");
+    });
+    b.addEventListener("pointermove", (e) => {
+      if (!drag) return;
+      if (Math.abs(e.clientX - drag.sx) + Math.abs(e.clientY - drag.sy) > 5) gest.moved = true;
+      const br = b.getBoundingClientRect();
+      drag.el.style.left = ((e.clientX - br.left - drag.ox) / br.width * 100) + "%";
+      drag.el.style.top = ((e.clientY - br.top - drag.oy) / br.height * 100) + "%";
+    });
+    const end = () => { if (drag) drag.el.classList.remove("dragging"); drag = null; };
+    b.addEventListener("pointerup", end);
+    b.addEventListener("pointercancel", end);
+  }
+
+  /* Lightbox (transparent blurred gallery) */
+  let lbIdx = 0;
+  function openLB(i) {
+    lbIdx = ((i % N) + N) % N;
+    $("#lbIn").innerHTML = pic(lbIdx);
+    $("#lbCnt").textContent = `${lbIdx + 1} / ${N} · ${D.caps[lbIdx]}`;
+    $("#lb").classList.add("open");
+  }
+  const closeLB = () => $("#lb").classList.remove("open");
+  $("#lbX").onclick = closeLB;
+  $("#lb").addEventListener("click", (e) => { if (e.target.id === "lb") closeLB(); });
+  $("#lbP").onclick = (e) => { e.stopPropagation(); openLB(lbIdx - 1); };
+  $("#lbN").onclick = (e) => { e.stopPropagation(); openLB(lbIdx + 1); };
+  $("#lbFile").addEventListener("change", async (e) => {
+    const f = e.target.files[0]; if (!f) return;
+    D.photos[lbIdx] = await resizeImage(f);
+    if (!save()) toast("স্টোরেজ ভর্তি, ছবি ছোট করে আবার দিন");
+    renderAll(); openLB(lbIdx); toast("ছবি যুক্ত হয়েছে");
+  });
+
+  // one global click handler for every photo
+  document.addEventListener("click", (e) => {
+    if (gest.moved) { gest.moved = false; return; }
+    if (e.target.closest("#lb")) return;
+    const p = e.target.closest(".pic[data-i]");
+    if (p) { openLB(+p.dataset.i); return; }
+  });
+
+  function resizeImage(file, max = 900) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const s = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement("canvas");
+        c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+        c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+        res(c.toDataURL("image/jpeg", 0.82));
+      };
+      img.onerror = rej;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  /* Confetti */
+  $("#party").onclick = () => {
+    const cols = ["#f59e0b", "#ff4f8b", "#60a5fa", "#34d399", "#a78bfa", "#fff"];
+    for (let i = 0; i < 90; i++) {
+      const c = document.createElement("i");
+      c.className = "conf";
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.background = cols[i % cols.length];
+      c.style.setProperty("--t", (2.2 + Math.random() * 2) + "s");
+      c.style.setProperty("--x", (Math.random() * 120 - 60) + "px");
+      c.style.setProperty("--rr", (Math.random() * 720 - 360) + "deg");
+      c.style.animationDelay = Math.random() * .5 + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4800);
+    }
+  };
+
+  /* Slide navigation + HUD */
+  const slides = $$(".slide");
+  let active = 0;
+  const go = (i) => { i = Math.max(0, Math.min(SLIDES - 1, i)); slides[i].scrollIntoView({ behavior: "smooth", block: "start" }); };
+  function setActive(i) {
+    active = i;
+    slides.forEach((s, k) => s.classList.toggle("on", k === i));
+    $("#hLabel").textContent = `${String(i + 1).padStart(2, "0")} / ${String(SLIDES).padStart(2, "0")} · ${slides[i].dataset.label.toUpperCase()}`;
+    $$("#dots i").forEach((d, k) => d.classList.toggle("a", k === i));
+    $("#hPrev").disabled = i === 0;
+    $("#hNext").disabled = i === SLIDES - 1;
+  }
+  $("#dots").innerHTML = slides.map(() => "<i></i>").join("");
+  $("#hPrev").onclick = () => go(active - 1);
+  $("#hNext").onclick = () => go(active + 1);
+  const io = new IntersectionObserver((es) => {
+    es.forEach((e) => { if (e.isIntersecting && e.intersectionRatio > .55) setActive(slides.indexOf(e.target)); });
+  }, { threshold: [0.55] });
+  slides.forEach((s) => io.observe(s));
+  document.addEventListener("keydown", (e) => {
+    if ($("#lb").classList.contains("open")) {
+      if (e.key === "Escape") closeLB();
+      if (e.key === "ArrowRight") openLB(lbIdx + 1);
+      if (e.key === "ArrowLeft") openLB(lbIdx - 1);
+      return;
+    }
+    if ($("#letterView").classList.contains("show")) { if (e.key === "Escape") $("#letterView").classList.remove("show"); return; }
+    if (e.target.matches("input,textarea")) return;
+    if (e.key === "ArrowDown" || e.key === "PageDown") { e.preventDefault(); go(active + 1); }
+    if (e.key === "ArrowUp" || e.key === "PageUp") { e.preventDefault(); go(active - 1); }
+    if (e.key === "Escape") { $("#admin").classList.remove("open"); $("#pw").classList.remove("open"); }
+  });
+  let hudT;
+  addEventListener("scroll", () => { $("#hud").style.opacity = .4; clearTimeout(hudT); hudT = setTimeout(() => ($("#hud").style.opacity = 1), 900); }, { passive: true });
+
+  /* Admin */
+  $("#adminBtn").onclick = () => { $("#pw").classList.add("open"); setTimeout(() => $("#pwInput").focus(), 60); };
+  const tryPw = () => {
+    if ($("#pwInput").value === "394") {
+      $("#pw").classList.remove("open"); $("#pwInput").value = "";
+      openAdmin();
+    } else { toast("ভুল পাসওয়ার্ড"); $("#pwInput").value = ""; }
+  };
+  $("#pwGo").onclick = tryPw;
+  $("#pwInput").addEventListener("keydown", (e) => { if (e.key === "Enter") tryPw(); });
+  $("#pw").addEventListener("click", (e) => { if (e.target.id === "pw") $("#pw").classList.remove("open"); });
+
+  function openAdmin() {
+    $$("[data-f]").forEach((el) => (el.value = D[el.dataset.f] ?? ""));
+    $("#quotesBox").innerHTML = D.quotes.map((q, i) => `<label class="f">স্প্রেড ${i + 1}</label><textarea data-q="${i}">${esc(q)}</textarea>`).join("");
+    $$("[data-q]").forEach((el) => (el.value = D.quotes[+el.dataset.q] ?? ""));
+    $("#capsBox").innerHTML = D.caps.map((c, i) => `<div><label class="f">ছবি ${i + 1}</label><input type="text" data-cap="${i}" value="${esc(c)}"></div>`).join("");
+    const s = $("#slots"); s.innerHTML = "";
+    for (let i = 0; i < N; i++) {
+      const d = document.createElement("div");
+      d.className = "slot";
+      d.innerHTML = `${pic(i)}<div>স্লট ${i + 1}</div><input type="file" accept="image/*" data-slot="${i}">`;
+      s.appendChild(d);
+    }
+    s.querySelectorAll("input[type=file]").forEach((inp) => inp.addEventListener("change", async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      D.photos[+inp.dataset.slot] = await resizeImage(f);
+      if (!save()) toast("স্টোরেজ ভর্তি, ছবি ছোট করুন");
+      renderAll(); openAdmin(); toast("ছবি যুক্ত হয়েছে");
+    }));
+    $("#admin").classList.add("open");
+  }
+  $("#saveBtn").onclick = () => {
+    $$("[data-f]").forEach((el) => (D[el.dataset.f] = el.value));
+    $$("[data-q]").forEach((el) => (D.quotes[+el.dataset.q] = el.value));
+    $$("[data-cap]").forEach((el) => (D.caps[+el.dataset.cap] = el.value));
+    const ok = save();
+    renderAll();
+    toast(ok ? "সেভ হয়েছে" : "সেভ হয়নি (স্টোরেজ ভর্তি)");
+  };
+  $("#resetBtn").onclick = () => {
+    if (!confirm("সব লেখা ও ছবি মুছে ডিফল্টে ফিরবেন?")) return;
+    D = { ...DEF, photos: [...DEF.photos], caps: [...DEF.caps], quotes: [...DEF.quotes] };
+    save(); renderAll(); openAdmin(); toast("রিসেট হয়েছে");
+  };
+  $("#closeAdmin").onclick = () => $("#admin").classList.remove("open");
+
+  /* Letter */
+  function renderLetter() {
+    const title = (D.letterTitle || "").replace("{name}", D.name || "");
+    $("#letterTitle").textContent = title;
+    $("#letterBody").innerHTML = (D.letterBody || "").split(/\n\s*\n/).filter((x) => x.trim())
+      .map((x) => `<p>${esc(x.trim()).replace(/\n/g, "<br>")}</p>`).join("");
+    $("#letterSign").innerHTML = esc(D.letterSign || "").replace(/\n/g, "<br>");
+  }
+  const env = $("#env");
+  function openLetter() {
+    if (!env.classList.contains("open")) {
+      env.classList.add("open");
+      setTimeout(() => $("#letterView").classList.add("show"), 900);
+    } else {
+      $("#letterView").classList.add("show");
+    }
+  }
+  env.addEventListener("click", openLetter);
+  env.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") openLetter(); });
+  $("#letterClose").onclick = () => $("#letterView").classList.remove("show");
+  $("#letterView").addEventListener("click", (e) => { if (e.target.id === "letterView") $("#letterView").classList.remove("show"); });
+
+  /* Render */
+  let boardInit = false;
+  function renderAll() {
+    renderLetter();
+    renderText(); renderSpiral(); renderBanners(); renderGalaxy(); renderBook();
+    if (!boardInit) boardInit = true;
+    renderBoard();
+    if ($("#lb").classList.contains("open")) openLB(lbIdx);
+  }
+  /* Opening: tap the box -> kathgolap flower -> name cards -> cover */
+  const op = $("#opener"), gbox = $("#gbox");
+  document.body.classList.add("opening");
+  let opened = false, started = false, namesTimer = null;
+  function finishOpener() {
+    if (opened) return; opened = true;
+    clearTimeout(namesTimer);
+    op.classList.add("hide");
+    document.body.classList.remove("opening");
+    setTimeout(() => op.remove(), 1000);
+  }
+  $("#oSkip").onclick = finishOpener;
+  function openBox() {
+    if (started) return; started = true;
+    gbox.classList.add("open");
+    $("#boxStage").classList.add("gone");
+    setTimeout(() => $("#flowerFrame").classList.add("show"), 450);
+    namesTimer = setTimeout(finishOpener, 40000);
+  }
+  gbox.addEventListener("click", openBox);
+  gbox.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") openBox(); });
+  window.addEventListener("message", (e) => {
+    if (!e.data || e.data.type !== "kg-bloomed") return;
+    clearTimeout(namesTimer);
+    $("#flowerFrame").classList.remove("show");
+    $("#nameCards").classList.add("show");
+    namesTimer = setTimeout(finishOpener, 7500);
+  });
+  try { localStorage.setItem("bday_site_v3", JSON.stringify(D)); } catch (e) {}
+
+  renderAll();
+  setActive(0);
+  resizeStars(); drawStars(0);
+  requestAnimationFrame(spin);
+  addEventListener("resize", () => { resizeStars(); });
+})();
+</script>
+</body>
+</html>
