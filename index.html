@@ -102,13 +102,49 @@ button{font-family:inherit;cursor:pointer}
 .gctl button:hover{background:rgba(255,255,255,.2)}
 .hint{position:absolute;left:0;right:0;bottom:22px;text-align:center;color:#8d8d9b;font-size:13px;z-index:3;pointer-events:none}
 .sec-dark{position:absolute;top:84px;left:0;right:0;text-align:center;z-index:3;pointer-events:none;color:#fff}
+.dn{position:absolute;left:50%;bottom:54px;transform:translateX(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.1);backdrop-filter:blur(8px);color:#fff;border-radius:999px;padding:8px 18px 4px;font:500 13px "Hind Siliguri",Inter,sans-serif;white-space:nowrap}
+.dn:hover{background:rgba(255,255,255,.22)}
+.dn i{font-style:normal;font-size:20px;line-height:1;animation:bob 1.6s ease-in-out infinite}
 
 /* 4. Sketchbook */
 #s3{background:#0e0d12;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 16px 40px}
 #s3 .sec{text-align:center;margin-bottom:24px}
 .bookWrap{display:flex;align-items:center;gap:16px;width:100%;justify-content:center}
-.book{position:relative;width:min(84vw,920px);height:min(62vh,560px);perspective:1800px}
-.spread{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;background:#f7f4ec;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.6);overflow:hidden;animation:turn .8s cubic-bezier(.2,.8,.2,1)}
+.book{position:relative;width:min(84vw,920px);height:min(62vh,560px);perspective:1800px;transition:transform 1.2s cubic-bezier(.6,0,.2,1)}
+.book:not(.open){transform:translateX(-25%)}
+#spreadHost{position:absolute;inset:0;transition:clip-path 1.2s cubic-bezier(.6,0,.2,1);clip-path:inset(-90px)}
+.book:not(.open) #spreadHost{clip-path:inset(-90px -90px -90px 50%)}
+.cover{position:absolute;top:0;left:50%;width:50%;height:100%;transform-origin:left center;transform-style:preserve-3d;transition:transform 1.2s cubic-bezier(.6,0,.2,1);z-index:5;cursor:pointer}
+.book.open .cover{transform:rotateY(-180deg);cursor:default}
+.cover.done{visibility:hidden}
+.cover .front,.cover .back{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:4px 12px 12px 4px}
+.cover .front{display:grid;place-content:center;justify-items:center;gap:10px;text-align:center;padding:24px;color:#f3d594;overflow:hidden;
+  background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,0) 9%,rgba(0,0,0,0) 92%,rgba(0,0,0,.25)),repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 2px,transparent 2px 4px),radial-gradient(circle at 30% 18%,#8a2b3c,#4d1020 58%,#2a0711);
+  box-shadow:inset 0 0 0 2px rgba(255,215,140,.22),0 30px 70px rgba(0,0,0,.65),6px 6px 0 0 #ece5d3}
+.cover .front::before{content:"";position:absolute;inset:14px 22px 14px 18px;border:1.5px dashed rgba(243,213,148,.5);border-radius:6px;pointer-events:none}
+.cover .front::after{content:"";position:absolute;top:0;bottom:0;right:26px;width:12px;background:linear-gradient(90deg,#150508,#2d0d14 50%,#150508);box-shadow:0 0 6px rgba(0,0,0,.5)}
+.cover .front .ct{font:700 clamp(34px,5vw,60px)/1 Caveat;color:#f3d594;text-shadow:0 2px 0 rgba(0,0,0,.45),0 0 18px rgba(243,213,148,.25);margin-right:34px}
+.cover .front .cn{font:500 12px Inter;letter-spacing:.3em;text-transform:uppercase;color:#d9b77a;margin-right:34px}
+.cover .front .cs{font-size:26px;margin-right:34px;animation:wobble 4s ease-in-out infinite}
+.cover .front .ch{margin-top:14px;margin-right:34px;font:500 13px "Hind Siliguri",Inter,sans-serif;color:#e8dcc8;letter-spacing:.06em;animation:fadeHint 2.4s ease-in-out infinite}
+.cover .back{transform:rotateY(180deg);background:linear-gradient(270deg,rgba(0,0,0,.25),rgba(0,0,0,0) 10%),repeating-linear-gradient(45deg,#efe4cc 0 6px,#e8dbbf 6px 12px);box-shadow:inset 0 0 0 1px rgba(120,90,50,.2)}
+#bClose{margin-top:12px;display:none}
+#spreadHost{perspective:2200px}
+.spread.noanim{animation:none}
+.leaf{position:absolute;top:0;height:100%;width:50%;z-index:4;transform-style:preserve-3d;transition:transform .95s cubic-bezier(.55,.05,.25,1)}
+.leaf.next{left:50%;transform-origin:left center}
+.leaf.next.go{transform:rotateY(-180deg)}
+.leaf.prev{left:0;transform-origin:right center}
+.leaf.prev.go{transform:rotateY(180deg)}
+.leaf .lf,.leaf .lb2{position:absolute;inset:0;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#f7f4ec}
+.leaf .lb2{transform:rotateY(180deg)}
+.leaf .pg{height:100%}
+.leaf.next .lf::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.2),rgba(0,0,0,0) 25%);transition:opacity .95s;opacity:1}
+.leaf.next.go .lf::after{opacity:0}
+.leaf.prev .lf::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(270deg,rgba(0,0,0,.2),rgba(0,0,0,0) 25%)}
+.leaf.next.go,.leaf.prev.go{filter:drop-shadow(0 10px 18px rgba(0,0,0,.35))}
+@media (max-width:820px){.leaf.next,.leaf.prev{left:0;width:100%}}
+.spread{position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;background:#f7f4ec;border-radius:6px;box-shadow:0 30px 70px rgba(0,0,0,.6),4px 4px 0 0 #ece5d3,8px 8px 0 0 #e0d7bf;overflow:hidden;animation:turn .8s cubic-bezier(.2,.8,.2,1)}
 .spread::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:22px;margin-left:-11px;background:linear-gradient(90deg,rgba(0,0,0,.18),rgba(0,0,0,0) 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.18));z-index:2}
 @keyframes turn{from{opacity:0;transform:perspective(1800px) rotateY(-28deg) translateX(40px)}to{opacity:1;transform:none}}
 .pg{position:relative;padding:34px 34px;display:grid;align-content:center;gap:14px}
@@ -124,9 +160,9 @@ button{font-family:inherit;cursor:pointer}
 #bNo{margin-top:18px;color:#8d8d9b;font:500 13px Inter;letter-spacing:.2em}
 
 /* 5. Pinboard */
-#s4{background:#d8d0bf;background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);background-size:30px 30px;display:flex;flex-direction:column;align-items:center;padding:84px 4vw 30px}
+#s4{background:#d8d0bf;background-image:linear-gradient(rgba(0,0,0,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.05) 1px,transparent 1px);background-size:30px 30px;display:flex;flex-direction:column;align-items:center;padding:84px 4vw 40px;height:auto;min-height:100vh}
 #s4 .sec{text-align:center;margin-bottom:8px}
-#board{position:relative;flex:1;width:100%;max-width:1200px;margin-top:6px}
+#board{position:relative;flex:1;width:100%;max-width:1200px;margin-top:6px;min-height:960px}
 .pol{position:absolute;width:clamp(150px,19vw,210px);padding:10px 10px 40px;background:#fff;box-shadow:0 12px 26px rgba(0,0,0,.25);cursor:grab;touch-action:none;user-select:none;transition:box-shadow .25s,transform .35s cubic-bezier(.2,.8,.2,1);transform:rotate(var(--r));animation:drop .9s cubic-bezier(.2,.9,.2,1) both;animation-delay:var(--d)}
 @keyframes drop{from{opacity:0;margin-top:-40px}}
 .pol:hover{transform:rotate(0) scale(1.03)}
@@ -137,6 +173,10 @@ button{font-family:inherit;cursor:pointer}
 .heart{position:absolute;top:-16px;right:-14px;font-size:28px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));animation:beat 1.6s ease-in-out infinite;z-index:2}
 @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
 .bdl{position:absolute;color:#7a6d55;font:700 18px Caveat;pointer-events:none}
+#s4 .pol{width:clamp(70px,10.5vw,128px);padding:5px 5px 24px;box-shadow:0 8px 16px rgba(0,0,0,.25)}
+#s4 .pol .cap{font-size:15px;bottom:4px}
+#s4 .pin{width:12px;height:12px;margin-left:-6px;top:-6px}
+#s4 .heart{font-size:19px;top:-11px;right:-8px}
 
 /* 6. Finale */
 #s5{display:grid;place-items:center;background:radial-gradient(circle at 50% 30%,#fff3dc,var(--cream) 60%);text-align:center;padding:40px}
@@ -254,10 +294,10 @@ body.opening #s0 *{animation-play-state:paused!important}
   .spread::before{display:none}
   .pg{padding:18px}
   .pg.r{display:none}
-  .pol{width:150px}
-  #s4 .pol{width:140px}
-  #s4{height:auto;min-height:100vh}
-  #board{min-height:1500px}
+  #s4 .pol{width:max(64px,18vw)}
+  #board{min-height:1250px}
+  .book:not(.open){transform:none}
+  .cover{left:0;width:100%}
   #hLabel{min-width:0;max-width:130px;overflow:hidden;text-overflow:ellipsis}
   #dots{display:none}
 }
@@ -331,6 +371,7 @@ body.opening #s0 *{animation-play-state:paused!important}
     <button id="zreset" aria-label="Reset">⟲</button>
   </div>
   <p class="hint">টেনে সরান · চিমটি বা + − দিয়ে জুম · ছবিতে ট্যাপ করুন</p>
+  <button class="dn" id="gDown" aria-label="নিচের অংশে যান"><span>নিচে যেতে এখানে ক্লিক করুন</span><i>⌄</i></button>
 </section>
 
 <!-- 4. Sketchbook -->
@@ -338,10 +379,17 @@ body.opening #s0 *{animation-play-state:paused!important}
   <h2 class="sec fx"><b>Sketch</b>book</h2>
   <div class="bookWrap fx" style="--d:.15s">
     <button class="arr" id="bPrev" aria-label="Previous page">‹</button>
-    <div class="book" id="book"></div>
+    <div class="book" id="book">
+      <div id="spreadHost"></div>
+      <div class="cover" id="cover" role="button" tabindex="0" aria-label="বই খুলুন">
+        <div class="front"><span class="cs">✦</span><span class="ct">Sketchbook</span><span class="cn" data-k="name"></span><span class="ch">ট্যাপ করে বইটা খুলুন</span></div>
+        <div class="back"></div>
+      </div>
+    </div>
     <button class="arr" id="bNext" aria-label="Next page">›</button>
   </div>
   <p id="bNo"></p>
+  <button class="btn ghost" id="bClose">বই বন্ধ করুন</button>
 </section>
 
 <!-- 5. Pinboard -->
@@ -459,14 +507,14 @@ body.opening #s0 *{animation-play-state:paused!important}
 
 <script>
 (() => {
-  const KEY = "bday_site_v3", N = 16, SLIDES = 7;
+  const KEY = "bday_site_v3", N = 42, SLIDES = 7;
   const DEF = {
-    date: "AUG 5", t1: "Happy", t2: "Birthday", name: "Wasika",
-    nameBn: "ওয়াসিকা", nameEn: "Wasika", nameAr: "وَاثِقَة",
+    date: "AUG 5", t1: "Happy", t2: "Birthday", name: "Compact folder",
+    nameBn: "কমপ্যাক্ট ফোল্ডার", nameEn: "Compact folder", nameAr: "وَاثِقَة",
     meaning: "বিশ্বস্ত · নির্ভরযোগ্য   |   Trustworthy · Reliable",
-    flowerWords: "Wasika\nওয়াসিকা\nوَاثِقَة\nTrustworthy\nবিশ্বস্ত\nReliable\nনির্ভরযোগ্য\nFaithful\nHappy Birthday\nশুভ জন্মদিন",
-    msg: "wishing you a day filled with love, laughter, and all the happiness your heart can hold. May this year bring you endless joy and unforgettable memories. Happy Birthday, Wasika!",
-    closing: "Wasika, তোমার প্রতিটি হাসি আমার দিনটাকে সুন্দর করে। এই বছরটা তোমার জন্য হোক ভালোবাসা, আনন্দ আর অসংখ্য সুন্দর স্মৃতিতে ভরা।",
+    flowerWords: "Compact folder\nকমপ্যাক্ট ফোল্ডার\nوَاثِقَة\nTrustworthy\nবিশ্বস্ত\nReliable\nনির্ভরযোগ্য\nFaithful\nHappy Birthday\nশুভ জন্মদিন",
+    msg: "wishing you a day filled with love, laughter, and all the happiness your heart can hold. May this year bring you endless joy and unforgettable memories. Happy Birthday, Compact folder!",
+    closing: "Compact folder, তোমার প্রতিটি হাসি আমার দিনটাকে সুন্দর করে। এই বছরটা তোমার জন্য হোক ভালোবাসা, আনন্দ আর অসংখ্য সুন্দর স্মৃতিতে ভরা।",
     letterTitle: "প্রিয় {name},",
     letterBody: "আল্লাহ তোরে সেটা ভাঙ্গা টাকা পয়সার মালিক বানাক, আর তোর টাকলা জামাই যেন অনেক বড় লোক হোক। আমিন।\n\nআজকের দিনটা তোর খুব ভালো যাক, আর তুই সবসময় এভাবে হাসিখুশি থাকিস।তোর সাথে থাকলে সবকিছু বেশি মজার লাগে। আল্লাহ তোর সব ভালো চাওয়া পূরণ করুক।",
     letterSign: "your dostu ,\nSaduuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu",
@@ -481,20 +529,33 @@ body.opening #s0 *{animation-play-state:paused!important}
       "Forever grateful for you. Keep shining."
     ],
     stickers: "🌹,🦋,🌙,🎀,🐱,✨,🌸,💖,🎈,⭐",
-    caps: Array(16).fill("Wasika"),
-    photos: ["images/05.jpg","images/16.jpg","images/15.jpg","images/09.jpg","images/14.jpg","images/08.jpg","images/01.jpg","images/06.jpg","images/07.jpg","images/12.jpg","images/13.jpg","images/03.jpg","images/02.jpg","images/04.jpg","images/10.jpg","images/11.jpg"]
+    caps: Array(42).fill("Compact folder"),
+    photos: ["images/05.jpg","images/16.jpg","images/15.jpg","images/09.jpg","images/14.jpg","images/08.jpg","images/01.jpg","images/06.jpg","images/07.jpg","images/12.jpg","images/13.jpg","images/03.jpg","images/02.jpg","images/04.jpg","images/10.jpg","images/11.jpg",
+      "images/17.jpg","images/18.jpg","images/19.jpg","images/20.jpg","images/21.jpg","images/22.jpg","images/23.jpg","images/24.jpg","images/25.jpg","images/26.jpg","images/27.jpg","images/28.jpg","images/29.jpg","images/30.jpeg","images/31.jpeg","images/32.jpeg","images/33.jpeg","images/34.jpeg","images/35.jpeg","images/36.jpeg","images/37.jpeg","images/38.jpeg","images/39.jpeg","images/40.jpeg","images/41.jpeg","images/42.jpeg"]
   };
   let D;
   try { D = { ...DEF, ...JSON.parse(localStorage.getItem(KEY) || "{}") }; } catch { D = { ...DEF }; }
-  D.photos = D.photos || []; D.caps = D.caps || DEF.caps; D.quotes = D.quotes || DEF.quotes;
+  D.photos = DEF.photos.map((p, i) => (D.photos && D.photos[i]) || p);
+  D.caps = DEF.caps.map((c, i) => (D.caps && D.caps[i]) || c);
+  D.quotes = D.quotes || DEF.quotes;
+  const nick = (v) => typeof v === "string" ? v.replace(/Wasika/g, "Compact folder").replace(/ওয়াসিকা/g, "কমপ্যাক্ট ফোল্ডার") : v;
+  ["name", "nameEn", "nameBn", "msg", "closing", "flowerWords"].forEach((k) => (D[k] = nick(D[k])));
+  D.caps = D.caps.map(nick);
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); return true; } catch { return false; } };
 
   const $ = (s) => document.querySelector(s);
   const $$ = (s) => [...document.querySelectorAll(s)];
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  window.__imgFix = (el) => {
+    const s = el.getAttribute("src") || "";
+    if (el.dataset.t || s.startsWith("data:")) return;
+    el.dataset.t = 1;
+    const m = s.match(/\.(jpe?g)$/i); if (!m) return;
+    el.src = s.replace(/\.[^.]+$/, m[1].toLowerCase() === "jpg" ? ".jpeg" : ".jpg");
+  };
   const stickers = () => D.stickers.split(",").map((s) => s.trim()).filter(Boolean);
   const pic = (i) => `<div class="pic" data-i="${i}">${D.photos[i]
-    ? `<img src="${D.photos[i]}" alt="">`
+    ? `<img src="${D.photos[i]}" alt="" onerror="window.__imgFix(this)">`
     : `<div class="ph"><span>📷</span></div>`}</div>`;
   const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1900); };
   const rnd = (i, k) => (((i + 1) * 9301 + k * 49297) % 233280) / 233280;
@@ -520,7 +581,7 @@ body.opening #s0 *{animation-play-state:paused!important}
       el.style.setProperty("--r", ((i * 37) % 36 - 18) + "deg");
       el.style.setProperty("--d", (0.2 + t * 1.1).toFixed(2) + "s");
       el.style.setProperty("--fd", (-i * 0.4) + "s");
-      el.innerHTML = `<div class="in polaroid">${pic(i % N)}</div>`;
+      el.innerHTML = `<div class="in polaroid">${pic((i * 5 + 3) % N)}</div>`;
       sp.appendChild(el);
     }
   }
@@ -546,15 +607,15 @@ body.opening #s0 *{animation-play-state:paused!important}
   const pts = new Map();
   function renderGalaxy() {
     space.innerHTML = "";
-    const count = 16;
+    const count = N;
     for (let i = 0; i < count; i++) {
-      const ang = i * 2.399, rad = 110 + ((i * 53) % 380);
+      const ang = i * 2.399, rad = 85 + 78 * Math.sqrt(i);
       const el = document.createElement("div");
       el.className = "orb";
       el.style.left = Math.cos(ang) * rad * 1.45 + "px";
       el.style.top = Math.sin(ang) * rad * 0.8 + "px";
       el.style.setProperty("--r", ((i * 23) % 14 - 7) + "deg");
-      el.style.setProperty("--d", (i * 0.07).toFixed(2) + "s");
+      el.style.setProperty("--d", (i * 0.04).toFixed(2) + "s");
       el.style.setProperty("--fd", (-i * 0.5) + "s");
       el.innerHTML = `<div class="og">${pic(i % N)}<span>${esc(D.caps[i % N])}</span></div>`;
       space.appendChild(el);
@@ -623,20 +684,63 @@ body.opening #s0 *{animation-play-state:paused!important}
   /* Sketchbook spreads */
   let spread = 0;
   const SPREADS = N / 2;
-  function renderBook() {
-    const st = stickers();
-    const s = spread;
-    $("#book").innerHTML = `
-      <div class="spread">
-        <div class="pg l">${pic(2 * s)}<span class="stk a" style="--r:-9deg">${esc(st[(2 * s) % st.length] || "")}</span></div>
-        <div class="pg r"><div class="quote">${esc(D.quotes[s] || "")}</div>${pic(2 * s + 1)}<span class="stk b" style="--r:10deg">${esc(st[(2 * s + 1) % st.length] || "")}</span></div>
-      </div>`;
-    $("#bNo").textContent = `${s + 1} / ${SPREADS}`;
-    $("#bPrev").disabled = s === 0;
-    $("#bNext").disabled = s === SPREADS - 1;
+  const pageL = (s) => { const st = stickers(); return `<div class="pg l">${pic(2 * s)}<span class="stk a" style="--r:-9deg">${esc(st[(2 * s) % st.length] || "")}</span></div>`; };
+  const pageR = (s) => { const st = stickers(); return `<div class="pg r"><div class="quote">${esc(D.quotes[s % D.quotes.length] || "")}</div>${pic(2 * s + 1)}<span class="stk b" style="--r:10deg">${esc(st[(2 * s + 1) % st.length] || "")}</span></div>`; };
+  function setNav() {
+    $("#bNo").textContent = `${spread + 1} / ${SPREADS}`;
+    $("#bPrev").disabled = spread === 0;
+    $("#bNext").disabled = spread === SPREADS - 1;
   }
-  $("#bPrev").onclick = () => { if (spread > 0) { spread--; renderBook(); } };
-  $("#bNext").onclick = () => { if (spread < SPREADS - 1) { spread++; renderBook(); } };
+  function renderBook() {
+    $("#spreadHost").innerHTML = `<div class="spread">${pageL(spread)}${pageR(spread)}</div>`;
+    setNav();
+  }
+  let flipping = false;
+  function flip(dir) {
+    const t = spread + dir;
+    if (flipping || t < 0 || t >= SPREADS) return;
+    flipping = true;
+    const mob = innerWidth <= 820, host = $("#spreadHost");
+    const blank = '<div class="pg l"></div>';
+    let under, front, back;
+    if (dir > 0) {
+      under = mob ? pageL(t) : pageL(spread) + pageR(t);
+      front = mob ? pageL(spread) : pageR(spread);
+      back = mob ? blank : pageL(t);
+    } else {
+      under = mob ? pageL(t) : pageL(t) + pageR(spread);
+      front = mob ? pageL(spread) : pageL(spread);
+      back = mob ? blank : pageR(t);
+    }
+    host.innerHTML = `<div class="spread noanim">${under}</div><div class="leaf ${dir > 0 ? "next" : "prev"}"><div class="lf">${front}</div><div class="lb2">${back}</div></div>`;
+    const leaf = host.querySelector(".leaf");
+    void leaf.offsetWidth;
+    leaf.classList.add("go");
+    let done = false;
+    const fin = () => { if (done) return; done = true; spread = t; flipping = false; renderBook(); };
+    leaf.addEventListener("transitionend", (e) => { if (e.target === leaf && e.propertyName === "transform") fin(); });
+    setTimeout(fin, 1150);
+  }
+  let bookOpen = false;
+  const bookEl = $("#book"), coverEl = $("#cover");
+  function openBook() {
+    if (bookOpen) return; bookOpen = true;
+    bookEl.classList.add("open");
+    $("#bClose").style.display = "inline-block";
+    setTimeout(() => { if (bookOpen) coverEl.classList.add("done"); }, 1300);
+  }
+  function closeBook() {
+    if (!bookOpen) return; bookOpen = false;
+    coverEl.classList.remove("done");
+    void coverEl.offsetWidth;
+    bookEl.classList.remove("open");
+    $("#bClose").style.display = "none";
+  }
+  coverEl.addEventListener("click", openBook);
+  coverEl.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") openBook(); });
+  $("#bClose").onclick = closeBook;
+  $("#bPrev").onclick = () => { if (!bookOpen) return; flip(-1); };
+  $("#bNext").onclick = () => { if (!bookOpen) { openBook(); return; } flip(1); };
   let swipe = null;
   $("#book").addEventListener("pointerdown", (e) => (swipe = e.clientX));
   $("#book").addEventListener("pointerup", (e) => {
@@ -649,8 +753,8 @@ body.opening #s0 *{animation-play-state:paused!important}
   function renderBoard() {
     const b = $("#board");
     b.innerHTML = "";
-    const cols = innerWidth < 820 ? 2 : 4, rows = Math.ceil(12 / cols);
-    for (let i = 0; i < 12; i++) {
+    const cols = innerWidth < 820 ? 4 : 7, rows = Math.ceil(N / cols);
+    for (let i = 0; i < N; i++) {
       const col = i % cols, row = Math.floor(i / cols);
       const el = document.createElement("div");
       el.className = "pol";
@@ -660,7 +764,7 @@ body.opening #s0 *{animation-play-state:paused!important}
       el.style.left = x + "%";
       el.style.top = y + "%";
       el.style.setProperty("--r", (rnd(i, 3) * 14 - 7).toFixed(1) + "deg");
-      el.style.setProperty("--d", (i * 0.08).toFixed(2) + "s");
+      el.style.setProperty("--d", (i * 0.04).toFixed(2) + "s");
       el.innerHTML = `<span class="pin"></span>${i % 3 === 0 ? '<span class="heart">💖</span>' : ""}${pic(i)}<div class="cap">${esc(D.caps[i])}</div>`;
       b.appendChild(el);
     }
@@ -761,6 +865,7 @@ body.opening #s0 *{animation-play-state:paused!important}
     $("#hNext").disabled = i === SLIDES - 1;
   }
   $("#dots").innerHTML = slides.map(() => "<i></i>").join("");
+  $("#gDown").onclick = () => go(active + 1);
   $("#hPrev").onclick = () => go(active - 1);
   $("#hNext").onclick = () => go(active + 1);
   const io = new IntersectionObserver((es) => {
@@ -889,7 +994,6 @@ body.opening #s0 *{animation-play-state:paused!important}
     $("#nameCards").classList.add("show");
     namesTimer = setTimeout(finishOpener, 7500);
   });
-  try { localStorage.setItem("bday_site_v3", JSON.stringify(D)); } catch (e) {}
 
   renderAll();
   setActive(0);
